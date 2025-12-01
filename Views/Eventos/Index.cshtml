@@ -1,0 +1,65 @@
+﻿@model IEnumerable<NawiWebAdmin.Models.Evento>
+
+@{
+    ViewData["Title"] = "Mis Eventos";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>📅 Gestión de Eventos</h2>
+        <a asp-action="Create" class="btn btn-success">
+            + Nuevo Evento
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            No hay eventos registrados. ¡Crea el primero!
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive shadow-sm rounded">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Título</th>
+                        <th>Fecha</th>
+                        <th>Lugar</th>
+                        <th>Categoría</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold">@item.Titulo</td>
+                            <td>@item.Fecha.ToShortDateString() @item.Hora.ToString("HH:mm")</td>
+                            <td>@item.Lugar</td>
+                            <td>
+                                <span class="badge bg-primary">@item.IdCategoria</span>
+                            </td>
+                            <td>
+                                @if (item.Estado == "Activo")
+                                {
+                                    <span class="badge bg-success">Activo</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">@item.Estado</span>
+                                }
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary">✏️</button>
+                                <button class="btn btn-sm btn-outline-danger">🗑️</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
