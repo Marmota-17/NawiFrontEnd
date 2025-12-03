@@ -70,5 +70,70 @@ namespace NawiWebAdmin.Services
 
         // Clasecita interna para leer la respuesta del login
         private class LoginResponse { public string Token { get; set; } }
+
+        // 4. OBTENER UN SOLO EVENTO (Para llenar el formulario de edición)
+        public async Task<Evento?> GetEventoAsync(long id)
+        {
+            // AgregarToken(); // Descomenta si tu GET {id} en la API es privado
+            var response = await _http.GetAsync($"api/eventos/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<Evento>();
+            }
+            return null;
+        }
+
+        // 5. EDITAR EVENTO (PUT)
+        public async Task<bool> EditarEventoAsync(long id, Evento evento)
+        {
+            AgregarToken(); // Requiere seguridad
+            var response = await _http.PutAsJsonAsync($"api/eventos/{id}", evento);
+            return response.IsSuccessStatusCode;
+        }
+
+        // 6. ELIMINAR EVENTO (DELETE)
+        public async Task<bool> EliminarEventoAsync(long id)
+        {
+            AgregarToken(); // Requiere seguridad
+            var response = await _http.DeleteAsync($"api/eventos/{id}");
+            return response.IsSuccessStatusCode;
+        }
+
+        // 5. OBTENER CATEGORÍAS (Para el dropdown)
+        public async Task<List<Categoria>> GetCategoriasAsync()
+        {
+            var response = await _http.GetAsync("api/categorias");
+            if (response.IsSuccessStatusCode)
+            {
+                // Usamos la librería System.Net.Http.Json
+                return await response.Content.ReadFromJsonAsync<List<Categoria>>() ?? new List<Categoria>();
+            }
+            return new List<Categoria>();
+        }
+        // 7. SUBIR IMAGEN (Faltaba este método)
+        public async Task<string?> SubirImagenAsync(IFormFile archivo)
+        {
+            AgregarToken(); // Seguridad
+
+            using var content = new MultipartFormDataContent();
+            using var fileStream = archivo.OpenReadStream();
+            var fileContent = new StreamContent(fileStream);
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue(archivo.ContentType);
+
+            content.Add(fileContent, "file", archivo.FileName);
+
+            // Llamamos al endpoint del StorageController en el Backend
+            var response = await _http.PostAsync("api/storage/upload", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<ImageResponse>();
+                return result?.Url; // Retorna la URL pública (ej: https://.../foto.jpg)
+            }
+            return null;
+        }
+
+        // Clase auxiliar para leer la respuesta JSON { "url": "..." }
+        private class ImageResponse { public string Url { get; set; } }
     }
 }

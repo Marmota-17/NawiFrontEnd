@@ -37,10 +37,12 @@
                     {
                         <tr>
                             <td class="fw-bold">@item.Titulo</td>
-                            <td>@item.Fecha.ToShortDateString() @item.Hora.ToString("HH:mm")</td>
+                            <td>
+                                @item.Fecha.ToString("dd/MM/yyyy") a las @item.Hora
+                            </td>
                             <td>@item.Lugar</td>
                             <td>
-                                <span class="badge bg-primary">@item.IdCategoria</span>
+                                <span class="badge bg-primary">@item.Categoria</span>
                             </td>
                             <td>
                                 @if (item.Estado == "Activo")
@@ -53,8 +55,18 @@
                                 }
                             </td>
                             <td>
-                                <button class="btn btn-sm btn-outline-primary">✏️</button>
-                                <button class="btn btn-sm btn-outline-danger">🗑️</button>
+                                <div class="d-flex gap-2">
+                                    <a asp-action="Edit" asp-route-id="@item.IdEvento" class="btn btn-sm btn-outline-primary">
+                                        ✏️
+                                    </a>
+
+                                    <form asp-action="Delete" asp-route-id="@item.IdEvento" method="post"
+                                          onsubmit="return confirm('¿Estás seguro de borrar este evento?');">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            🗑️
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     }
